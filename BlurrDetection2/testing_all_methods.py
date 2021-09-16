@@ -21,7 +21,7 @@ from BlurrDetection2.walvet import WavletTransform
 
 base_dir = os.path.split(os.getcwd())[0]
 blur_detection_folder_path = os.getcwd()
-debug = True
+debug = False
 
 
 class BlurDetection:
@@ -55,8 +55,6 @@ def archive_dataset_data(feature_value_extractor):
     total_image_features = []
     total_labels = []
 
-    """ debug purpose"""
-    image_counters = 0
     for group in os.listdir(dataset_path):
         group_folder_path = os.path.join(dataset_path, group)
         for i, file_name in enumerate(os.listdir(group_folder_path)):
@@ -68,46 +66,65 @@ def archive_dataset_data(feature_value_extractor):
                 total_labels.append('Sharp')
             else:
                 total_labels.append('Blur')
-            """ debug purpose """
-            image_counters += 1
-            if debug and image_counters >= 7:
-                image_counters = 0
-                break
     return np.array(total_image_features), np.array(total_labels)
 
 
 def motion_blur_text_dataset_Data(feature_value_extractor):
     dataset_path = os.path.join(base_dir, "Data", "Motion Blur Text Images")
-    total_image_features = np.array([])
-    total_labels = np.array([])
+    total_image_features = []
+    total_labels = []
     for group in os.listdir(dataset_path):
         group_folder_path = os.path.join(dataset_path, group)
         for i, file_name in enumerate(os.listdir(group_folder_path)):
-            group_folder = os.path.join(dataset_path, group)
-            img_address = os.path.join(group_folder, file_name)
+            img_address = os.path.join(group_folder_path, file_name)
             img = cv2.imread(img_address)
             feature_values = feature_value_extractor(img)
-            np.append(total_image_features, feature_values)
+            total_image_features.append(feature_values)
             if group == "resize":
-                total_labels = np.append(total_labels, 'Sharp')
+                total_labels.append('Sharp')
             else:
-                total_labels = np.append(total_labels, 'Blur')
-    total_image_features = np.array(total_image_features)
-    return total_image_features, total_labels
+                total_labels.append('Blur')
+    return np.array(total_image_features), np.array(total_labels)
+
+
+def custom_image_folder_data(feature_value_extractor):
+    dataset_path = os.path.join(base_dir, "Images", )
+    total_image_features = []
+    total_labels = []
+
+    image_labels = ["Sharp" for i in range(61)]
+    blur_image_numbers = [8, 12, 14, 17, 20, 21, 23, 24, 25, 26, 27, 28, 32, 34, 38, 39, 40, 43, 45, 47, 49, 52, 53, 56,
+                          58, 59, 60, 61]
+    for i in blur_image_numbers:
+        image_labels[i - 1] = "Blur"
+
+    for i, file_name in enumerate(os.listdir(dataset_path)):
+        img_address = os.path.join(dataset_path, file_name)
+        img = cv2.imread(img_address)
+        feature_values = feature_value_extractor(img)
+        total_image_features.append(feature_values)
+        file_index = int(file_name.split(".")[0][7:]) - 1
+        total_labels.append(image_labels[file_index])
+    return np.array(total_image_features), np.array(total_labels)
 
 
 def load_dataset_x_y_values(feature_value_extractor):
     x_archive, y_archive = archive_dataset_data(feature_value_extractor)
-    # x_motion_blur, y_motion_blur = motion_blur_text_dataset_Data(feature_value_extractor)
-    return x_archive, y_archive
+    x_motion_blur, y_motion_blur = motion_blur_text_dataset_Data(feature_value_extractor)
+    x_custom, y_custom = custom_image_folder_data(feature_value_extractor)
+    x_data = x_custom + x_archive + x_motion_blur
+    y_data = y_custom + y_archive + y_motion_blur
+    return x_data, y_data
 
 
 def main():
-    pkl_file_name = "blur_detection.joblib.pkl"
     pkl_folder_path = os.path.join(blur_detection_folder_path, "classifiers_results_pkl")
     load = False
     if load:
+        # TODO
+        pkl_file_name = "blur_detection.joblib.pkl"
         blurry_detection = joblib.load(os.path.join(pkl_folder_path, pkl_file_name))
+
         # DO stuff
     else:
         # training
@@ -125,10 +142,17 @@ def main():
         blur_detection = BlurDetection(features)
 
         # gathering images
+        print("load all images data")
         total_image_features, total_labels = load_dataset_x_y_values(blur_detection.feature_vector)
         train_x, test_x, train_y, test_y = train_test_split(total_image_features, total_labels,
                                                             test_size=0.3,
                                                             random_state=42)
+        # saving calculated total_image_features and total labels
+        image_features = os.path.join(pkl_folder_path,
+                                      f"all_images_features-{total_image_features.shape[0]}.joblib.pkl")
+        _ = joblib.dump(total_image_features, image_features, compress=9)
+        image_labels = os.path.join(pkl_folder_path, f"all_images_labels-{total_labels.shape[0]}.joblib.pkl")
+        _ = joblib.dump(total_labels, image_labels, compress=9)
 
         for i, cls in enumerate(classifiers):
             blur_detection.set_classifier(cls)
