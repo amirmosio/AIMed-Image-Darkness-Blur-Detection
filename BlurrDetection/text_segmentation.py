@@ -2,8 +2,8 @@ import cv2
 import numpy as np
 
 # import wize
-from BlurrDetection2.filter_and_editing import calhe_filter_with_lab
-from BlurrDetection2.resize_img_with_bound import resize
+from BlurrDetection.filter_and_editing import calhe_filter_with_lab
+from BlurrDetection.resize_img_with_bound import resize
 
 
 def non_max_suppression_fast(boxes, overlapThresh=0.1):

@@ -1,6 +1,6 @@
 import cv2
 
-from BlurrDetection2.feature_class import FeatureValue
+from BlurrDetection.feature_class import FeatureValue
 
 
 class LaplacianOnWhole(FeatureValue):

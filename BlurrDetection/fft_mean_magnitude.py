@@ -3,7 +3,7 @@ import math
 import cv2
 import numpy as np
 
-from BlurrDetection2.feature_class import FeatureValue
+from BlurrDetection.feature_class import FeatureValue
 
 
 class FFTMeanMagnitude(FeatureValue):

@@ -3,8 +3,8 @@ import random as rand
 import cv2
 import numpy as np
 
-from BlurrDetection2.feature_class import FeatureValue
-from BlurrDetection2.text_segmentation import maximality_region_detection
+from BlurrDetection.feature_class import FeatureValue
+from BlurrDetection.text_segmentation import maximality_region_detection
 
 
 class LaplacianWithTextSegmentation(FeatureValue):

@@ -11,13 +11,13 @@ from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
 
-from BlurrDetection2.feature_class import FeatureValue
-from BlurrDetection2.fft_mean_magnitude import FFTMeanMagnitude
-from BlurrDetection2.laplacian import LaplacianOnWhole
-from BlurrDetection2.laplacian_with_text_segmentation import LaplacianWithTextSegmentation
-from BlurrDetection2.lpss import LPSS
-from BlurrDetection2.max_saturation import MaxSaturation
-from BlurrDetection2.walvet import WavletTransform
+from BlurrDetection.feature_class import FeatureValue
+from BlurrDetection.fft_mean_magnitude import FFTMeanMagnitude
+from BlurrDetection.laplacian import LaplacianOnWhole
+from BlurrDetection.laplacian_with_text_segmentation import LaplacianWithTextSegmentation
+from BlurrDetection.lpss import LPSS
+from BlurrDetection.max_saturation import MaxSaturation
+from BlurrDetection.walvet import WavletTransform
 
 base_dir = os.path.split(os.getcwd())[0]
 blur_detection_folder_path = os.getcwd()
@@ -136,8 +136,12 @@ def main():
             GaussianProcessClassifier(1.0 * RBF(1.0))
         ]
 
-        features = [FFTMeanMagnitude, LaplacianOnWhole, LaplacianWithTextSegmentation, LPSS,
-                    MaxSaturation, WavletTransform]
+        features = [FFTMeanMagnitude,
+                    LaplacianOnWhole,
+                    LaplacianWithTextSegmentation,
+                    LPSS,
+                    MaxSaturation,
+                    WavletTransform]
 
         blur_detection = BlurDetection(features)
 

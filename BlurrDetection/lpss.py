@@ -3,7 +3,7 @@ import numpy as np
 import scipy.stats as stats
 from scipy.stats import linregress
 
-from BlurrDetection2.feature_class import FeatureValue
+from BlurrDetection.feature_class import FeatureValue
 
 
 class LPSS(FeatureValue):
